@@ -20,7 +20,6 @@ Window::Window(const char* title, int width, int height){
 	);
 
 	rects = new EXList<Rect>();
-
 	baseColors = new List<Color>();
 	baseColors->add(c_white);
 	baseColors->add(c_gray);
@@ -31,11 +30,37 @@ Window::Window(const char* title, int width, int height){
 
 	currentColor = c_red;
 	int colorIndex = 0;
+
+	ticks = SDL_GetTicks();
+	grid = new GridRenderer(0, 0, 16, 16);
+	snake = new Snake(new Point(16, 16), 3, c_green);
+	snakeTimer = new Timer(SNAKE_SPEED(snake->getSize()));
+	createApple();
 }
 
 Window::~Window(){
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
+	free(mouse);
+	free(mouseRect);
+	free(keyboard);
+	free(rects);
+	free(grid);
+	free(snake);
+	free(snakeTimer);
+	free(baseColors);
+	free(currentColor);
+}
+
+void Window::setTitle(const char* title){
+	SDL_SetWindowTitle(window, title);
+}
+
+void Window::createApple(){
+	apple = new Point(
+		GRID_RAND_X(),
+		GRID_RAND_Y()
+	);
 }
 
 void Window::initMouse(int mouseSize){
@@ -70,7 +95,18 @@ void Window::alterKeyboard(KEYBOARD_OP operation, void* operand){
 	}
 }
 
-void Window::update(bool* running){
+void Window::updateRealTime(double delta){
+	snakeTimer->update(delta);
+	if(snakeTimer->isFinished()){
+		snake->move();
+		if(snake->eatApple(apple))
+			createApple();
+
+		snakeTimer->setTime(SNAKE_SPEED(snake->getSize()));
+	}
+}
+
+void Window::updateFrame(bool* running){
 	SDL_Event event;
 	while(SDL_PollEvent(&event)){
 		switch(event.type){
@@ -84,6 +120,7 @@ void Window::update(bool* running){
 
 	mouse->updateTick();
 	keyboard->updateTick();
+
 }
 
 void Window::processInput(){
@@ -101,7 +138,6 @@ void Window::processInput(){
 		);
 		rect->setColor(currentColor);
 		rects->add(rect);
-		std::cout << rects->size() << std::endl;
 	}
 
 	if(mouse->getRClickPressed()){
@@ -113,17 +149,17 @@ void Window::processInput(){
 		}
 	}
 
-	if(keyboard->pressed("vk_left") > 0){
-		colorIndex = (++colorIndex >= baseColors->size())? 0 : colorIndex;
-		currentColor = baseColors->get(colorIndex);
-		std::cout << currentColor->r << std::endl;
-	}
+	if(keyboard->pressed("vk_left") > 0)
+		snake->setDirection(SNAKE_LEFT);
 
-	if(keyboard->pressed("vk_right") > 0){
-		colorIndex = (--colorIndex < 0)? baseColors->size()-1 : colorIndex;
-		currentColor = baseColors->get(colorIndex);
-		std::cout << currentColor->r << std::endl;
-	}
+	if(keyboard->pressed("vk_right") > 0)
+		snake->setDirection(SNAKE_RIGHT);
+
+	if(keyboard->pressed("vk_up") > 0)
+		snake->setDirection(SNAKE_UP);
+
+	if(keyboard->pressed("vk_down") > 0)
+		snake->setDirection(SNAKE_DOWN);
 }
 
 void Window::render(){
@@ -142,6 +178,10 @@ void Window::render(){
 	);
 	mouseRect->setColor(currentColor);
 	mouseRect->render(renderer);
+
+	snake->render(grid);
+	grid->add(apple, c_red);
+	grid->render(renderer);
 
 	SDL_RenderPresent(renderer);
 }

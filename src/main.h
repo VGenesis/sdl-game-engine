@@ -58,10 +58,4 @@
 #include "templates.hpp"
 #define _TEMPLATES_HPP
 #endif
-	
-// Window Constants
-#define WINDOW_TITLE	"Game Window"
-#define WINDOW_WIDTH	640
-#define WINDOW_HEIGHT	480
-#define MOUSE_RECT_SIZE 20
 

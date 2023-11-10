@@ -5,10 +5,6 @@
  *	Depends solely on the keyboard.hpp file.
  */
 
-#ifndef _IOSTREAM
-#include <iostream>
-#define _IOSTREAM
-#endif
 #ifndef _KEYBOARD_HPP
 #include "../include/keyboard.hpp"
 #define _KEYBOARD_HPP
@@ -74,7 +70,6 @@ void Keyboard::updateTick(){
  */
 void Keyboard::addKey(std::string name, SDL_Scancode scancode){
 	keys->add(new Key(name, scancode));
-	std::cout << keys->size() << std::endl;
 }
 
 /*
@@ -85,7 +80,6 @@ int Keyboard::pressed(std::string name){
 	int i = 0;
 	Key* k = NULL;
 	while((k = keys->get(i++)) != NULL){
-		std::cout << k->name << std::endl;
 		if(k->name == name) return k->pressed;
 	}
 	return KEYBOARD_KEY_NOT_FOUND;
