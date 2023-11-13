@@ -7,6 +7,11 @@ class Color{
 
 		Color(int r, int g, int b);
 		Color(int r, int g, int b, int a);
+
+		Color* clone();
+		void shift(int r, int g, int b);
+
+		void print();
 };
 
 Color* const c_white =	new Color(255,	255,	255);
@@ -20,7 +25,7 @@ Color* const c_lime =		new Color(64, 192, 0);
 Color* const c_green =		new Color(0, 255, 0);
 Color* const c_teal =		new Color(0, 192, 64);
 Color* const c_cyan =		new Color(0, 128, 128);
-Color* const c_sky =		new Color(0, 64, 255);
+Color* const c_sky =		new Color(0, 64, 192);
 Color* const c_blue =		new Color(0, 0, 255);
 Color* const c_purple =		new Color(64, 0, 192);
 Color* const c_magenta =	new Color(128, 0, 128);

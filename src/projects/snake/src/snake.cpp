@@ -2,21 +2,20 @@
 #include "../include/snake.hpp"
 #define _SNAKE_HPP
 #endif
-#ifndef _GLOBAL_HPP
-#include "../../global.hpp"
-#define _GLOBAL_HPP
-#endif
 #ifndef _IOSTREAM
 #include <iostream>
 #define _IOSTREAM
 #endif
-
 
 Snake::Snake(Point* position, int size){
 	this->position = position;
 	this->direction = new Point(-1, 0);
 	positions = new Queue<Point>();
 	this->size = size;
+
+	PaletteBuilder* builder = PaletteBuilder::getInstance();
+	this->pal_alive = builder->emptyPalette("pal_alive");;
+	this->pal_dead = builder->emptyPalette("pal_dead");;
 }
 
 Snake::~Snake(){
@@ -28,9 +27,23 @@ Snake::~Snake(){
 int Snake::getSize() {return size;}
 bool Snake::isAlive() {return alive;}
 
-void Snake::setColor(Color* alive, Color* dead){
-	this->c_alive = alive;
-	this->c_dead = dead;
+void Snake::setColor(Color* color, int segmentCount){
+	int r = color->r;
+	int g = color->g;
+	int b = color->b;
+
+	int r_min = r / 4;
+	int g_min = g / 4;
+	int b_min = b / 4;
+
+	Color* c_alive = color;
+	Color* c_dead = new Color(r_min, g_min, b_min);
+	Color* c_edge = new Color(2*r_min, 2*g_min, 2*b_min);
+
+	PaletteBuilder* pb = PaletteBuilder::getInstance();
+	this->pal_alive = pb->fromGradient("pal_alive", c_edge, c_alive, segmentCount);
+	this->pal_dead = pb->fromGradient("pal_dead", c_dead, c_edge, segmentCount);
+
 }
 
 void Snake::setDirection(SnakeDirection direction){
@@ -90,11 +103,13 @@ bool Snake::eatApple(Point* apple){
 }
 
 void Snake::render(GridRenderer* renderer){
-	Color* color = (alive)? c_alive : c_dead;
+	Palette* palette = (alive)? pal_alive : pal_dead;
 	Point* segment;
 	int i = 0;
+	int pal_size = palette->size();
 	while((segment = positions->get(i++)) != NULL){
+		Color* color = palette->getByIndex(i % pal_size);
 		renderer->add(segment, color);
 	}
-	renderer->add(position, color);
+	renderer->add(position, pal_alive->getByIndex(pal_size-1));
 }

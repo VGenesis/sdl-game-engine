@@ -6,6 +6,10 @@
 #include "../../../ds/include/queue.hpp"
 #define _QUEUE_HPP
 #endif
+#ifndef _GLOBAL_HPP
+#include "../../global.hpp"
+#define _GLOBAL_HPP
+#endif
 
 enum SnakeDirection{
 	SNAKE_LEFT,
@@ -21,8 +25,8 @@ class Snake{
 		SnakeDirection sdirection;
 		Queue<Point>* positions;
 
-		Color* c_alive;
-		Color* c_dead;
+		Palette* pal_alive {NULL};
+		Palette* pal_dead {NULL};
 
 		int size;
 		bool alive {true};
@@ -35,7 +39,7 @@ class Snake{
 		int getSize();
 		bool isAlive();
 
-		void setColor(Color* alive, Color* dead);
+		void setColor(Color* color, int segmentCount);
 
 		void setDirection(SnakeDirection direction);
 		void move();

@@ -19,13 +19,11 @@ Window::Window(const char* title, int width, int height){
 		SDL_RENDERER_ACCELERATED
 	);
 
-	randomizeColors();
-
 	grid = new GridRenderer(0, 0, 16, 16);
 	snake = new Snake(new Point(16, 16), 3);
-	snake->setColor(c_snake_alive, c_snake_dead);
 	snakeTimer = new Timer(SNAKE_SPEED(snake->getSize()));
 
+	randomizeColors();
 	createApple();
 }
 
@@ -43,16 +41,12 @@ void Window::setTitle(const char* title){
 }
 
 void Window::randomizeColors(){
-	int i_alive = rand() % 12;
-	int i_dead = -1;
-	do{
-		i_dead = rand() % 12;
-	}while(i_dead == i_alive);
-
+	srand(time(NULL));
+	int i_snake = rand() % 12;
 	int i_apple = -1;
 	do{
 		i_apple = rand() % 12;
-	}while(i_apple == i_alive || i_apple == i_dead);
+	}while(i_apple == i_snake);
 
 	Color* colors[] = {
 		c_red,
@@ -69,14 +63,11 @@ void Window::randomizeColors(){
 		c_pink
 	};
 
-	c_snake_alive = colors[i_alive];
-	c_snake_dead = colors[i_dead];
+	snake->setColor(colors[i_snake], 8);
 	c_apple = colors[i_apple];
-
 }
 
 void Window::createApple(){
-	srand(time(NULL));
 	apple = new Point(
 		GRID_RAND_X(),
 		GRID_RAND_Y()
@@ -148,9 +139,8 @@ void Window::processInput(){
 			snake->setDirection(SNAKE_DOWN);
 	}else if(keyboard->pressed("vk_enter") > 0){
 		std::cout << "Restart" << std::endl;
-		randomizeColors();
 		snake = new Snake(new Point(16, 16), 3);
-		snake->setColor(c_snake_alive, c_snake_dead);
+		randomizeColors();
 		createApple();
 	}
 }

@@ -17,6 +17,14 @@
 #include "gfx/misc/include/color.hpp"
 #define _COLOR_HPP
 #endif
+#ifndef _PALETTE_HPP
+#include "gfx/misc/include/palette.hpp"
+#define _PALETTE_HPP
+#endif
+#ifndef _PALETTEBUILDER_HPP
+#include "gfx/misc/include/paletteBuilder.hpp"
+#define _PALETTEBUILDER_HPP
+#endif
 
 // Window Settings
 #define WINDOW_TITLE "Game Window"

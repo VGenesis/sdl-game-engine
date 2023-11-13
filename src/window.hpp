@@ -76,8 +76,7 @@ class Window{
 		Timer* snakeTimer {NULL};
 		Point* apple {NULL};
 
-		Color* c_snake_alive {c_green};
-		Color* c_snake_dead {c_yellow};
+		Palette* snakeColors {NULL};
 		Color* c_apple {c_red};
 
 		void randomizeColors();
