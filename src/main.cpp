@@ -10,18 +10,19 @@ int main(int argc, char* argv[]){
 			WINDOW_HEIGHT
 			);
 
-	window->initMouse(MOUSE_RECT_SIZE);
 	window->initKeyboard();
 
 	Key vk_left = *(new Key("vk_left", SDL_SCANCODE_LEFT));
 	Key vk_right = *(new Key("vk_right", SDL_SCANCODE_RIGHT));
 	Key vk_up = *(new Key("vk_up", SDL_SCANCODE_UP));
 	Key vk_down = *(new Key("vk_down", SDL_SCANCODE_DOWN));
+	Key vk_enter = *(new Key("vk_enter", SDL_SCANCODE_RETURN));
 
 	window->alterKeyboard(KB_ADD, static_cast<void*>(&vk_left));
 	window->alterKeyboard(KB_ADD, static_cast<void*>(&vk_right));
 	window->alterKeyboard(KB_ADD, static_cast<void*>(&vk_up));
 	window->alterKeyboard(KB_ADD, static_cast<void*>(&vk_down));
+	window->alterKeyboard(KB_ADD, static_cast<void*>(&vk_enter));
 
 	long ticks = SDL_GetTicks();
 	long ticks_1s = ticks;

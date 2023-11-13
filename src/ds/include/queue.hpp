@@ -3,6 +3,11 @@
  *	A standard generic Queue data structure.
  */
 
+#ifndef _IOSTREAM
+#include <iostream>
+#define _IOSTREAM
+#endif
+
 template <typename T>
 class Queue{
 	private:
@@ -55,14 +60,15 @@ class Queue{
 			return NULL;
 		}
 
-		int contains(T* element){
-			int count = 0;
+		bool contains(T* element){
+			int hits = 0;
 			QueueNode* iter = start;
-			while(iter != NULL){
-				if(iter->data = element) count++;
+			while(iter){
+				if(*(iter->data) == *element) return true;
 				iter = iter->next;
 			}
-			return count;
+
+			return false;
 		}
 
 		int size(){
@@ -79,5 +85,14 @@ class Queue{
 			while(start != NULL){
 				remove();
 			}
+		}
+
+		void print(){
+			QueueNode* iter = start;
+			while(iter){
+				iter->data->print();
+				iter = iter->next;
+			}
+			std::cout << std::endl;
 		}
 };

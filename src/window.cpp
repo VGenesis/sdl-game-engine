@@ -19,55 +19,68 @@ Window::Window(const char* title, int width, int height){
 		SDL_RENDERER_ACCELERATED
 	);
 
-	rects = new EXList<Rect>();
-	baseColors = new List<Color>();
-	baseColors->add(c_white);
-	baseColors->add(c_gray);
-	baseColors->add(c_black);
-	baseColors->add(c_red);
-	baseColors->add(c_green);
-	baseColors->add(c_blue);
+	randomizeColors();
 
-	currentColor = c_red;
-	int colorIndex = 0;
-
-	ticks = SDL_GetTicks();
 	grid = new GridRenderer(0, 0, 16, 16);
-	snake = new Snake(new Point(16, 16), 3, c_green);
+	snake = new Snake(new Point(16, 16), 3);
+	snake->setColor(c_snake_alive, c_snake_dead);
 	snakeTimer = new Timer(SNAKE_SPEED(snake->getSize()));
+
 	createApple();
 }
 
 Window::~Window(){
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
-	free(mouse);
-	free(mouseRect);
 	free(keyboard);
-	free(rects);
 	free(grid);
 	free(snake);
 	free(snakeTimer);
-	free(baseColors);
-	free(currentColor);
 }
 
 void Window::setTitle(const char* title){
 	SDL_SetWindowTitle(window, title);
 }
 
+void Window::randomizeColors(){
+	int i_alive = rand() % 12;
+	int i_dead = -1;
+	do{
+		i_dead = rand() % 12;
+	}while(i_dead == i_alive);
+
+	int i_apple = -1;
+	do{
+		i_apple = rand() % 12;
+	}while(i_apple == i_alive || i_apple == i_dead);
+
+	Color* colors[] = {
+		c_red,
+		c_orange,
+		c_yellow,
+		c_lime,
+		c_green,
+		c_teal,
+		c_cyan,
+		c_sky,
+		c_blue,
+		c_purple,
+		c_magenta,
+		c_pink
+	};
+
+	c_snake_alive = colors[i_alive];
+	c_snake_dead = colors[i_dead];
+	c_apple = colors[i_apple];
+
+}
+
 void Window::createApple(){
+	srand(time(NULL));
 	apple = new Point(
 		GRID_RAND_X(),
 		GRID_RAND_Y()
 	);
-}
-
-void Window::initMouse(int mouseSize){
-	mouse = new Mouse();
-	mouseRect = new Rect(0, 0, mouseSize, mouseSize);
-	mouseRect->setColor(currentColor);
-	this->mouseSize = mouseSize;
 }
 
 void Window::initKeyboard(){
@@ -96,13 +109,14 @@ void Window::alterKeyboard(KEYBOARD_OP operation, void* operand){
 }
 
 void Window::updateRealTime(double delta){
-	snakeTimer->update(delta);
-	if(snakeTimer->isFinished()){
-		snake->move();
-		if(snake->eatApple(apple))
+	if(snake->isAlive()){
+		snakeTimer->update(delta);
+		if(snakeTimer->isFinished()){
+			snake->move();
+			if(snake->eatApple(apple))
 			createApple();
-
-		snakeTimer->setTime(SNAKE_SPEED(snake->getSize()));
+			snakeTimer->setTime(SNAKE_SPEED(snake->getSize()));
+		}
 	}
 }
 
@@ -114,73 +128,39 @@ void Window::updateFrame(bool* running){
 				*running = false;
 				break;
 		}
-		mouse->updateEvent(event);
 		keyboard->updateEvent(event);
 	}
-
-	mouse->updateTick();
 	keyboard->updateTick();
-
 }
 
 void Window::processInput(){
-	int mx = mouse->getX();
-	int my = mouse->getY();
-	if(mouse->getLClickPressed()){
-		int xblock = mx - mx % mouseSize;
-		int yblock = my - my % mouseSize;
+	if(snake->isAlive()){
+		if(keyboard->pressed("vk_left") > 0)
+			snake->setDirection(SNAKE_LEFT);
 
-		Rect* rect = new Rect(
-			xblock,
-			yblock,
-			mouseSize,
-			mouseSize
-		);
-		rect->setColor(currentColor);
-		rects->add(rect);
+		if(keyboard->pressed("vk_right") > 0)
+			snake->setDirection(SNAKE_RIGHT);
+
+		if(keyboard->pressed("vk_up") > 0)
+			snake->setDirection(SNAKE_UP);
+
+		if(keyboard->pressed("vk_down") > 0)
+			snake->setDirection(SNAKE_DOWN);
+	}else if(keyboard->pressed("vk_enter") > 0){
+		std::cout << "Restart" << std::endl;
+		randomizeColors();
+		snake = new Snake(new Point(16, 16), 3);
+		snake->setColor(c_snake_alive, c_snake_dead);
+		createApple();
 	}
-
-	if(mouse->getRClickPressed()){
-		for(int i = 0; i < rects->size(); i++){
-			if(rects->get(i)->inside(mx, my)){
-				rects->remove(i);
-				i--;
-			}
-		}
-	}
-
-	if(keyboard->pressed("vk_left") > 0)
-		snake->setDirection(SNAKE_LEFT);
-
-	if(keyboard->pressed("vk_right") > 0)
-		snake->setDirection(SNAKE_RIGHT);
-
-	if(keyboard->pressed("vk_up") > 0)
-		snake->setDirection(SNAKE_UP);
-
-	if(keyboard->pressed("vk_down") > 0)
-		snake->setDirection(SNAKE_DOWN);
 }
 
 void Window::render(){
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
-	for(int i = 0; i < rects->size(); i++){
-		Rect* r = rects->get(i);
-		if(r != NULL) r->renderFill(renderer);
-	}
-
-	mouseRect->setPosition(new Point(
-			mouse->getX() - mouseSize/2,
-			mouse->getY() - mouseSize/2
-		)
-	);
-	mouseRect->setColor(currentColor);
-	mouseRect->render(renderer);
-
-	snake->render(grid);
-	grid->add(apple, c_red);
+	if(snake) snake->render(grid);
+	if(apple) grid->add(apple, c_apple);
 	grid->render(renderer);
 
 	SDL_RenderPresent(renderer);

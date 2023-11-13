@@ -29,14 +29,11 @@ class Point{
 
 		bool operator==(Point& other);
 
-		// Doesn't work
-		std::ostream& operator<<(std::ostream& outs);
-
 		void move(int x, int y);
 		void move(Point* p);
 		void scale(double scale);
 
 		void render(SDL_Renderer* renderer);
 
-		char* toString();
+		void print();
 };

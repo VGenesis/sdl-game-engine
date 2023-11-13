@@ -8,6 +8,16 @@
 #define _CMATH
 #endif
 
+// Graphics Libraries
+#ifndef _SDL_H
+#include <SDL2/SDL.h>
+#define _SDL_H
+#endif
+#ifndef _COLOR_HPP
+#include "gfx/misc/include/color.hpp"
+#define _COLOR_HPP
+#endif
+
 // Window Settings
 #define WINDOW_TITLE "Game Window"
 #define WINDOW_WIDTH 640

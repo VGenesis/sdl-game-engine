@@ -37,11 +37,7 @@ void Point::set(int x, int y){
 }
 
 bool Point::operator==(Point& other){
-	return(x == other.getX() && y == other.getY());
-}
-
-std::ostream& Point::operator<<(std::ostream& outs){
-	return outs << "(" << x << ", " << y << ")";
+	return (x == other.x) && (y == other.y);
 }
 
 void Point::set(Point* p){
@@ -77,3 +73,6 @@ void Point::render(SDL_Renderer* renderer){
 	SDL_RenderDrawPoint(renderer, x, y);
 }
 
+void Point::print(){
+	std::cout << "[" << x << ", " << y << "]";
+}

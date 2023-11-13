@@ -69,27 +69,18 @@ class Window{
 		SDL_Window* window {NULL};
 		SDL_Renderer* renderer {NULL};
 
-		Mouse* mouse {NULL};
-		Rect* mouseRect {NULL};
-		int mouseSize {0};
-
 		Keyboard* keyboard {NULL};
 
-		EXList<Rect>* rects {NULL};
 		GridRenderer* grid {NULL};
 		Snake* snake {NULL};
 		Timer* snakeTimer {NULL};
 		Point* apple {NULL};
 
-		List<Color>* baseColors {NULL};
-		int colorIndex {0};
-		Color* currentColor {NULL};
+		Color* c_snake_alive {c_green};
+		Color* c_snake_dead {c_yellow};
+		Color* c_apple {c_red};
 
-		long ticks {0};
-		long ticks_1s {0};
-		float delta {0.0};
-		int frames {0};
-
+		void randomizeColors();
 		void createApple();
 		
 	public:
